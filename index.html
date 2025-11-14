@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>श्री हनुमान जी</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* सुनिश्चित करता है कि कंटेनर हमेशा केंद्र में रहे */
+            box-sizing: border-box; 
+        }
+
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            /* छोटे डिवाइस के लिए अधिकतम चौड़ाई */
+            max-width: 500px; 
+            /* बहुत छोटे स्क्रीन पर ओवरफ्लो से बचने के लिए */
+            width: 95%; 
+        }
+
+        h1 {
+            color: #ff4500;
+            margin-bottom: 25px;
+            font-size: 1.5em; /* छोटे स्क्रीन के लिए थोड़ा छोटा */
+        }
+
+        .image-card img {
+            width: 100%;
+            /* max-width: 400px; की जरूरत नहीं, width: 100% काफी है */
+            height: auto;
+            border-radius: 10px;
+            border: 5px solid #ff4500;
+            margin-bottom: 20px;
+            /* सुनिश्चित करें कि छवि लोड न होने पर भी एक अच्छा दिखता है */
+            display: block; 
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            flex-wrap: wrap; /* छोटे स्क्रीन पर रैप करने की अनुमति दें */
+        }
+
+        .action-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+            flex-grow: 1; 
+            min-width: 100px; /* बटनों के लिए न्यूनतम चौड़ाई */
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .like-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .like-btn.liked {
+            background-color: #dc3545;
+        }
+
+        .download-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .whatsapp-btn {
+            background-color: #25d366;
+            color: white;
+        }
+
+        .action-btn i {
+            margin-right: 5px;
+        }
+
+        /* --- मोबाइल रिस्पॉन्सिवनेस --- */
+        @media (max-width: 500px) {
+            .container {
+                padding: 15px;
+                /* सुनिश्चित करें कि यह पूरी चौड़ाई का उपयोग करे */
+                width: 100%; 
+                margin: 0;
+                box-shadow: none; /* छोटे स्क्रीन पर शैडो हटा दें */
+            }
+            body {
+                padding: 10px;
+            }
+            .buttons-container {
+                /* बटन को एक के ऊपर एक Stack करें */
+                flex-direction: column;
+            }
+            .action-btn {
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>जय श्री राम | जय हनुमान ज्ञान गुन सागर</h1>
+        
+        <div class="image-card">
+            <img id="hanumanImage" src="https://m.media-amazon.com/images/I/61EzFcUUW5L._SL1200_.jpg" alt="हनुमान जी की छवि">
+            
+            <div class="buttons-container">
+                
+                <button id="likeBtn" class="action-btn like-btn">
+                    <i class="fas fa-thumbs-up"></i> लाइक (0)
+                </button>
+                
+                <button id="downloadBtn" class="action-btn download-btn">
+                    <i class="fas fa-download"></i> डाउनलोड
+                </button>
+                
+                <button id="whatsappShareBtn" class="action-btn whatsapp-btn">
+                    <i class="fab fa-whatsapp"></i> WhatsApp शेयर
+                </button>
+                
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const likeBtn = document.getElementById('likeBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const whatsappShareBtn = document.getElementById('whatsappShareBtn');
+            const hanumanImage = document.getElementById('hanumanImage');
+
+            let likes = 0;
+            let isLiked = false;
+
+            // --- Like Button Functionality ---
+            likeBtn.addEventListener('click', function() {
+                if (!isLiked) {
+                    likes++;
+                    likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> लाइक (${likes})`;
+                    likeBtn.classList.add('liked');
+                    isLiked = true;
+                    alert(`जय श्री राम! आपने लाइक किया। कुल लाइक: ${likes}`);
+                } else {
+                    alert('आप पहले ही लाइक कर चुके हैं!');
+                }
+            });
+
+            // --- Download Button Functionality (FIXED using fetch/Blob) ---
+            downloadBtn.addEventListener('click', async function() {
+                const urlToDownload = hanumanImage.src;
+                
+                // अगर URL placeholder है तो डाउनलोड न करें
+                if (urlToDownload.includes('placeholder')) {
+                     alert('पहले हनुमान जी की वास्तविक फोटो का URL बदलें।');
+                     return;
+                }
+
+                try {
+                    const response = await fetch(urlToDownload);
+                    const blob = await response.blob();
+                    const objectUrl = URL.createObjectURL(blob);
+
+                    const link = document.createElement('a');
+                    link.href = objectUrl;
+                    link.download = 'Hanuman_Ji_Photo.jpg'; 
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    URL.revokeObjectURL(objectUrl); 
+                    
+                    alert('हनुमान जी की छवि सफलतापूर्वक डाउनलोड हो रही है... 🙏');
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    alert('क्षमा करें, डाउनलोड करने में कोई समस्या आई। (शायद CORS/Security)');
+                }
+            });
+
+            // --- WhatsApp Share Button Functionality ---
+            whatsappShareBtn.addEventListener('click', function() {
+                const shareText = "जय श्री राम! श्री हनुमान जी की यह सुंदर छवि देखें।";
+                const pageUrl = window.location.href; 
+                
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`;
+                
+                window.open(whatsappUrl, '_blank');
+            });
+        });
+    </script>
+</body>
+</html>
