@@ -118,6 +118,7 @@
         <h1>जय श्री राम | जय हनुमान ज्ञान गुन सागर</h1>
         
         <div class="image-card">
+            <!-- यह इमेज URL है जिसे डाउनलोड किया जाएगा -->
             <img id="hanumanImage" src="https://m.media-amazon.com/images/I/61EzFcUUW5L._SL1200_.jpg" alt="हनुमान जी की छवि">
             
             <div class="buttons-container">
@@ -148,63 +149,47 @@
 
             let likes = 0;
             let isLiked = false;
-            const imageUrl = hanumanImage.src; 
 
-            // --- Like Button Functionality ---
+            // --- Like Button Functionality (वही) ---
             likeBtn.addEventListener('click', function() {
                 if (!isLiked) {
                     likes++;
                     likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> लाइक (${likes})`;
                     likeBtn.classList.add('liked');
                     isLiked = true;
-                    // चूंकि Canvas में alert काम नहीं करता है, हम एक Toast का उपयोग करते हैं
-                    // AndroidInterface.showToast(`जय श्री राम! आपने लाइक किया। कुल लाइक: ${likes}`);
                     console.log(`जय श्री राम! आपने लाइक किया। कुल लाइक: ${likes}`);
                 } else {
                     console.log('आप पहले ही लाइक कर चुके हैं!');
                 }
             });
 
-            // --- Download Button Functionality (FIXED) ---
-            downloadBtn.addEventListener('click', async function() {
-                const urlToDownload = hanumanImage.src;
-                
-                if (urlToDownload.includes('placeholder')) {
-                     console.error('पहले हनुमान जी की वास्तविक फोटो का URL बदलें।');
-                     return;
-                }
+            // --- Download Button Functionality (FIXED: Calls Kotlin Native Code) ---
+            downloadBtn.addEventListener('click', function() {
+                const imageUrl = hanumanImage.src; // इमेज URL प्राप्त करें
 
-                try {
-                    const response = await fetch(urlToDownload);
-                    const blob = await response.blob();
-                    const objectUrl = URL.createObjectURL(blob);
-
+                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.downloadImage) {
+                    // Native कोड को कॉल करें, जो DownloadManager का उपयोग करेगा
+                    AndroidInterface.downloadImage(imageUrl);
+                } else {
+                    // Fallback: ब्राउज़र में सामान्य डाउनलोड
                     const link = document.createElement('a');
-                    link.href = objectUrl;
+                    link.href = imageUrl;
                     link.download = 'Hanuman_Ji_Photo.jpg'; 
-                    
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    
-                    URL.revokeObjectURL(objectUrl); 
-                    
-                    console.log('हनुमान जी की छवि सफलतापूर्वक डाउनलोड हो रही है... 🙏');
-                } catch (error) {
-                    console.error('Download failed:', error);
+                    console.error("Native download interface not found, attempting browser fallback.");
                 }
             });
 
-            // --- WhatsApp Share Button Functionality (FIXED: Now passes Image URL) ---
+            // --- WhatsApp Share Button Functionality (वही) ---
             whatsappShareBtn.addEventListener('click', function() {
                 const shareText = "जय श्री राम! श्री हनुमान जी की यह सुंदर छवि देखें।";
-                const imageUrl = hanumanImage.src; // इमेज URL प्राप्त करें
+                const imageUrl = hanumanImage.src; 
                 
-                // Native Code को कॉल करें, नया फ़ंक्शन shareImageAndText
                 if (typeof AndroidInterface !== 'undefined' && AndroidInterface.shareImageAndText) {
                     AndroidInterface.shareImageAndText(shareText, imageUrl);
                 } else {
-                    // Fallback (केवल टेक्स्ट, क्योंकि इमेज शेयरिंग के लिए Native कोड चाहिए)
                     const finalShareText = encodeURIComponent(shareText);
                     window.location.href = `https://api.whatsapp.com/send?text=${finalShareText}`;
                 }
