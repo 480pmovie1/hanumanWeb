@@ -10,13 +10,13 @@
     <style>
         /* CSS Variables for easier theme changes */
         :root {
-            --primary-color: #ff4500; /* Deep Orange */
-            --bg-color: #f0f8ff; /* Azure White */
+            --primary-color: #4682B4; /* Steel Blue - आकर्षक रंग */
+            --bg-color: #f0f8ff; 
             --card-bg: #ffffff;
-            --like-color: #28a745; /* Green for Like */
-            --unlike-color: #dc3545; /* Red for Unlike/Delete */
-            --download-color: #007bff; /* Blue */
-            --whatsapp-color: #25d366; /* WhatsApp Green */
+            --like-color: #28a745; 
+            --unlike-color: #dc3545; 
+            --download-color: #1E90FF; /* Dodger Blue */
+            --whatsapp-color: #25d366; 
         }
 
         body {
@@ -27,14 +27,12 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            /* Scroll view के लिए min-height हटा दिया गया */
             box-sizing: border-box; 
         }
         
-        /* मुख्य स्क्रॉलिंग कंटेनर */
         .main-gallery {
             width: 100%;
-            max-width: 550px; /* अधिकतम चौड़ाई */
+            max-width: 550px; 
             padding: 10px;
         }
 
@@ -44,7 +42,7 @@
             padding: 15px;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px; /* कार्ड के बीच गैप */
+            margin-bottom: 20px; 
         }
 
         h2 {
@@ -54,41 +52,58 @@
             padding: 0 10px;
         }
 
-        /* --- Image Responsiveness --- */
+        /* --- Image Aspect Ratio Fix (नया सुधार) --- */
         .image-card {
-            border: 3px solid var(--primary-color);
+            border: 3px solid var(--primary-color); 
             border-radius: 8px;
             overflow: hidden; 
             margin-bottom: 15px;
+            
+            /* कंटेनर की कोई फिक्स्ड हाइट नहीं, यह इमेज के साइज़ को अडॉप्ट करेगा */
+            height: auto; 
+            /* ताकि बहुत लंबी इमेज स्क्रीन को ओवरलोड न करे */
+            max-height: 400px; 
         }
         
         .image-card img {
             width: 100%; 
-            height: auto; 
-            max-height: 400px; 
+            height: auto; /* इमेज अपनी ओरिजिनल हाइट लेगी */
+            max-height: 400px; /* यदि इमेज बहुत लंबी है तो कंटेनर की अधिकतम हाइट लेगी */
+            /* object-fit: cover/contain को हटा दिया गया ताकि इमेज का मूल अनुपात बना रहे */
             display: block; 
-            object-fit: cover; 
         }
+        
+        /* छोटी स्क्रीन के लिए अधिकतम हाइट कम करें */
+        @media (max-width: 400px) {
+            .image-card {
+                max-height: 300px;
+            }
+            .image-card img {
+                max-height: 300px;
+            }
+        }
+        /* --- Image Fix End --- */
 
-        /* --- Action Buttons Row --- */
+
+        /* --- Action Buttons Row (एक पंक्ति में) --- */
         .action-row {
             display: flex;
             gap: 8px; 
-            justify-content: space-between; /* बटनों के बीच समान स्थान */
+            justify-content: space-between; 
         }
 
         .action-btn {
-            padding: 10px 5px; /* पैडिंग कम की ताकि छोटे स्क्रीन पर फिट हो जाए */
+            padding: 10px 5px; 
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px; 
             font-weight: bold;
             transition: background-color 0.3s, transform 0.1s;
-            flex-grow: 1; /* बटनों को समान रूप से फैलने दें */
-            min-width: 0; /* बहुत छोटी स्क्रीन पर सिकुड़ने दें */
+            flex-grow: 1; 
+            min-width: 0; 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            white-space: nowrap; /* सुनिश्चित करें कि टेक्स्ट एक लाइन में रहे */
+            white-space: nowrap; 
         }
 
         .action-btn:active {
@@ -118,7 +133,6 @@
             margin-right: 5px;
         }
         
-        /* छोटी स्क्रीन पर आइकॉन को बड़ा करें और टेक्स्ट को छोटा करें यदि आवश्यक हो */
         @media (max-width: 400px) {
             .action-btn {
                 font-size: 12px;
@@ -137,6 +151,7 @@
         const contentItems = [
             { 
                 title: "जय श्री राम | जय हनुमान ज्ञान गुन सागर", 
+                // आपकी पुरानी इमेज URL वापस
                 url: "https://m.media-amazon.com/images/I/61EzFcUUW5L._SL1200_.jpg", 
                 shareText: "जय श्री राम! श्री हनुमान जी की यह सुंदर छवि देखें।" 
             },
@@ -155,7 +170,6 @@
         const galleryContainer = document.getElementById('galleryContainer');
 
         // --- 1. UI अपडेट फ़ंक्शन ---
-        // यह फ़ंक्शन विशिष्ट बटन को अपडेट करता है
         function updateLikeUI(likeBtn, isLiked) {
             if (isLiked) {
                 likeBtn.innerHTML = `<i class="fas fa-heart"></i> अनलाइक`; 
@@ -169,14 +183,11 @@
         // --- 2. लाइक हैंडलर फ़ंक्शन ---
         function handleLikeClick(event, itemUrl) {
             const likeBtn = event.currentTarget;
-            
-            // वर्तमान स्थिति को टॉगल करें (UI से क्लास चेक करें)
             let isLiked = likeBtn.classList.contains('liked');
-            isLiked = !isLiked; // नई स्थिति
+            isLiked = !isLiked; 
             
             updateLikeUI(likeBtn, isLiked);
             
-            // Kotlin को वर्तमान URL और नई स्थिति सेव करने के लिए भेजें
             if (typeof AndroidInterface !== 'undefined' && AndroidInterface.saveLikeState) {
                 AndroidInterface.saveLikeState(itemUrl, isLiked);
             }
@@ -215,7 +226,6 @@
 
         // --- 5. मुख्य रेंडरिंग फ़ंक्शन ---
         function renderGallery() {
-            // गैलरी को साफ़ करें
             galleryContainer.innerHTML = ''; 
 
             contentItems.forEach(item => {
@@ -232,6 +242,11 @@
                 const img = document.createElement('img');
                 img.src = item.url;
                 img.alt = item.title;
+                // एरर होने पर इमेज को बदलें
+                img.onerror = function() {
+                    this.onerror=null; 
+                    this.src='https://placehold.co/550x300/4682B4/ffffff?text=Image+Not+Found';
+                };
                 imageCard.appendChild(img);
 
                 // --- 3. बटन पंक्ति ---
@@ -242,14 +257,14 @@
                 const likeBtn = document.createElement('button');
                 likeBtn.className = 'action-btn like-btn';
                 
-                // Kotlin से लाइक की स्थिति लोड करें (सिंक्रोनस, क्योंकि यह DOMContentLoaded के बाद चलता है)
+                // Persistence Load
                 let isLiked = false;
                 if (typeof AndroidInterface !== 'undefined' && AndroidInterface.getIsLiked) {
                     isLiked = AndroidInterface.getIsLiked(item.url); 
                 }
                 updateLikeUI(likeBtn, isLiked);
                 
-                // इवेंट लिसनर
+                // Event Listener
                 likeBtn.addEventListener('click', (e) => handleLikeClick(e, item.url));
 
 
