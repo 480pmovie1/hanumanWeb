@@ -2,10 +2,8 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <!-- मोबाइल रिस्पॉन्सिवनेस के लिए जरूरी -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>श्री हनुमान जी</title>
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -70,12 +68,14 @@
             transform: scale(0.98);
         }
 
+        /* डिफ़ॉल्ट/लाइक नहीं किया गया: हरा */
         .like-btn {
             background-color: #28a745;
             color: white;
         }
-
-        .like-btn.liked {
+        
+        /* लाइक किया गया: लाल/अनलाइक करने के लिए तैयार */
+        .like-btn.liked { 
             background-color: #dc3545;
         }
 
@@ -118,13 +118,12 @@
         <h1>जय श्री राम | जय हनुमान ज्ञान गुन सागर</h1>
         
         <div class="image-card">
-            <!-- यह इमेज URL है जिसे डाउनलोड किया जाएगा -->
             <img id="hanumanImage" src="https://m.media-amazon.com/images/I/61EzFcUUW5L._SL1200_.jpg" alt="हनुमान जी की छवि">
             
             <div class="buttons-container">
                 
                 <button id="likeBtn" class="action-btn like-btn">
-                    <i class="fas fa-thumbs-up"></i> लाइक (0)
+                    <i class="fas fa-thumbs-up"></i> लाइक करें
                 </button>
                 
                 <button id="downloadBtn" class="action-btn download-btn">
@@ -141,44 +140,71 @@
     </div>
 
     <script>
+        // अब केवल एक ही स्थिति ट्रैक करें: यूज़र ने लाइक किया है या नहीं
+        let isLiked = false;
+        
+        const likeBtn = document.getElementById('likeBtn');
+        const hanumanImage = document.getElementById('hanumanImage');
+
+        // --- UI अपडेट फ़ंक्शन (अब केवल लाइक/अनलाइक दिखाता है) ---
+        function updateLikeUI() {
+            if (isLiked) {
+                likeBtn.innerHTML = `<i class="fas fa-heart"></i> अनलाइक करें`; // दिल का आइकन इस्तेमाल किया
+                likeBtn.classList.add('liked'); // लाल रंग लागू होगा
+            } else {
+                likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> लाइक करें`;
+                likeBtn.classList.remove('liked'); // हरा रंग लागू होगा
+            }
+        }
+
+        // --- डेटा लोड फ़ंक्शन ---
+        function loadInitialState() {
+            // Native कोड उपलब्ध होने पर Kotlin से डेटा लोड करें
+            if (typeof AndroidInterface !== 'undefined' && AndroidInterface.getIsLiked) {
+                isLiked = AndroidInterface.getIsLiked();
+                updateLikeUI();
+            } else {
+                // Fallback
+                isLiked = false;
+                updateLikeUI();
+                console.log("Native AndroidInterface not found. Using default state.");
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            const likeBtn = document.getElementById('likeBtn');
             const downloadBtn = document.getElementById('downloadBtn');
             const whatsappShareBtn = document.getElementById('whatsappShareBtn');
-            const hanumanImage = document.getElementById('hanumanImage');
+            
+            // 🥇 लोड होने पर डेटा खींचें
+            loadInitialState();
 
-            let likes = 0;
-            let isLiked = false;
-
-            // --- Like Button Functionality (वही) ---
+            // --- Like Button Functionality (सरल टॉगल) ---
             likeBtn.addEventListener('click', function() {
-                if (!isLiked) {
-                    likes++;
-                    likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> लाइक (${likes})`;
-                    likeBtn.classList.add('liked');
-                    isLiked = true;
-                    console.log(`जय श्री राम! आपने लाइक किया। कुल लाइक: ${likes}`);
-                } else {
-                    console.log('आप पहले ही लाइक कर चुके हैं!');
+                // स्थिति को पलटें
+                isLiked = !isLiked;
+                
+                // UI अपडेट करें
+                updateLikeUI();
+                
+                // Kotlin को नया डेटा सेव करने के लिए भेजें
+                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.saveLikeState) {
+                    AndroidInterface.saveLikeState(isLiked);
+                    console.log(`लाइक स्थिति सहेजी गई: ${isLiked}`);
                 }
             });
 
-            // --- Download Button Functionality (FIXED: Calls Kotlin Native Code) ---
+            // --- Download Button Functionality (वही) ---
             downloadBtn.addEventListener('click', function() {
-                const imageUrl = hanumanImage.src; // इमेज URL प्राप्त करें
-
+                const imageUrl = hanumanImage.src; 
                 if (typeof AndroidInterface !== 'undefined' && AndroidInterface.downloadImage) {
-                    // Native कोड को कॉल करें, जो DownloadManager का उपयोग करेगा
                     AndroidInterface.downloadImage(imageUrl);
                 } else {
-                    // Fallback: ब्राउज़र में सामान्य डाउनलोड
                     const link = document.createElement('a');
                     link.href = imageUrl;
                     link.download = 'Hanuman_Ji_Photo.jpg'; 
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    console.error("Native download interface not found, attempting browser fallback.");
                 }
             });
 
