@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>श्री हनुमान जी</title>
+    <title>श्री हनुमान जी और अन्य छवियाँ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
             background-color: #f0f8ff;
             color: #333;
             margin: 0;
@@ -32,17 +32,46 @@
 
         h1 {
             color: #ff4500;
-            margin-bottom: 25px;
+            margin-bottom: 10px; /* कम मार्जिन */
             font-size: 1.5em; 
+            min-height: 3em; /* टेक्स्ट बदलने पर CLS से बचने के लिए */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .image-card img {
             width: 100%;
-            height: auto;
+            height: 250px; /* स्थिर ऊँचाई */
+            object-fit: cover; /* इमेज को कवर करने के लिए */
             border-radius: 10px;
             border: 5px solid #ff4500;
             margin-bottom: 20px;
             display: block; 
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #008080;
+            color: white;
+            flex-grow: 1;
+            transition: background-color 0.3s;
+        }
+
+        .nav-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
 
         .buttons-container {
@@ -115,10 +144,17 @@
 </head>
 <body>
     <div class="container">
-        <h1>जय श्री राम | जय हनुमान ज्ञान गुन सागर</h1>
+        <!-- यह गतिशील रूप से अपडेट होगा -->
+        <h1 id="contentTitle">जय श्री राम | जय हनुमान ज्ञान गुन सागर</h1>
         
+        <!-- नेविगेशन बटन -->
+        <div class="nav-buttons">
+            <button id="prevBtn" class="nav-btn"><i class="fas fa-chevron-left"></i> पिछला</button>
+            <button id="nextBtn" class="nav-btn">अगला <i class="fas fa-chevron-right"></i></button>
+        </div>
+
         <div class="image-card">
-            <img id="hanumanImage" src="https://m.media-amazon.com/images/I/61EzFcUUW5L._SL1200_.jpg" alt="हनुमान जी की छवि">
+            <img id="mainImage" src="" alt="सामग्री छवि">
             
             <div class="buttons-container">
                 
@@ -140,86 +176,137 @@
     </div>
 
     <script>
-        // अब केवल एक ही स्थिति ट्रैक करें: यूज़र ने लाइक किया है या नहीं
-        let isLiked = false;
-        
-        const likeBtn = document.getElementById('likeBtn');
-        const hanumanImage = document.getElementById('hanumanImage');
+        // सभी सामग्री की लिस्ट (आपका दिया हुआ डेटा)
+        const contentItems = [
+            { 
+                title: "जय श्री राम | जय हनुमान ज्ञान गुन सागर", 
+                url: "https://m.media-amazon.com/images/I/61EzFcUUW5L._SL1200_.jpg", 
+                shareText: "जय श्री राम! श्री हनुमान जी की यह सुंदर छवि देखें।" 
+            },
+            { 
+                title: "समुंदर की लहरें", 
+                url: "https://plus.unsplash.com/premium_photo-1683910767554-7508927ef89f?q=80&w=808&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", 
+                shareText: "वाह! समुंदर की लहरों का सुंदर दृश्य।" 
+            },
+            { 
+                title: "सूरजमुखी की खुशबू", 
+                url: "https://images.unsplash.com/photo-1626808642875-0aa545482dfb?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", 
+                shareText: "सूरजमुखी की खुशबू वाला खूबसूरत दिन।" 
+            }
+        ];
 
-        // --- UI अपडेट फ़ंक्शन (अब केवल लाइक/अनलाइक दिखाता है) ---
+        let currentIndex = 0;
+        let isLiked = false; // वर्तमान आइटम के लिए लाइक स्थिति
+
+        const contentTitle = document.getElementById('contentTitle');
+        const mainImage = document.getElementById('mainImage');
+        const likeBtn = document.getElementById('likeBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const whatsappShareBtn = document.getElementById('whatsappShareBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // --- 1. UI अपडेट फ़ंक्शन ---
         function updateLikeUI() {
             if (isLiked) {
-                likeBtn.innerHTML = `<i class="fas fa-heart"></i> अनलाइक करें`; // दिल का आइकन इस्तेमाल किया
-                likeBtn.classList.add('liked'); // लाल रंग लागू होगा
+                likeBtn.innerHTML = `<i class="fas fa-heart"></i> अनलाइक करें`; 
+                likeBtn.classList.add('liked'); 
             } else {
                 likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> लाइक करें`;
-                likeBtn.classList.remove('liked'); // हरा रंग लागू होगा
+                likeBtn.classList.remove('liked'); 
             }
         }
-
-        // --- डेटा लोड फ़ंक्शन ---
-        function loadInitialState() {
-            // Native कोड उपलब्ध होने पर Kotlin से डेटा लोड करें
-            if (typeof AndroidInterface !== 'undefined' && AndroidInterface.getIsLiked) {
-                isLiked = AndroidInterface.getIsLiked();
-                updateLikeUI();
-            } else {
-                // Fallback
-                isLiked = false;
-                updateLikeUI();
-                console.log("Native AndroidInterface not found. Using default state.");
-            }
+        
+        // --- 2. नेविगेशन बटन स्थिति अपडेट फ़ंक्शन ---
+        function updateNavButtons() {
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === contentItems.length - 1;
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const downloadBtn = document.getElementById('downloadBtn');
-            const whatsappShareBtn = document.getElementById('whatsappShareBtn');
+        // --- 3. लोड कंटेंट और लाइक स्थिति फ़ंक्शन ---
+        function loadContent(index) {
+            const item = contentItems[index];
             
-            // 🥇 लोड होने पर डेटा खींचें
-            loadInitialState();
+            // टाइटल और इमेज बदलें
+            contentTitle.textContent = item.title;
+            mainImage.src = item.url;
+            
+            // Native कोड उपलब्ध होने पर लाइक स्थिति लोड करें
+            if (typeof AndroidInterface !== 'undefined' && AndroidInterface.getIsLiked) {
+                // इमेज URL को अनोखी ID (contentId) के रूप में उपयोग करें
+                isLiked = AndroidInterface.getIsLiked(item.url); 
+            } else {
+                isLiked = false;
+            }
+            
+            // UI और नेविगेशन बटन अपडेट करें
+            updateLikeUI();
+            updateNavButtons();
+        }
 
-            // --- Like Button Functionality (सरल टॉगल) ---
-            likeBtn.addEventListener('click', function() {
-                // स्थिति को पलटें
-                isLiked = !isLiked;
-                
-                // UI अपडेट करें
-                updateLikeUI();
-                
-                // Kotlin को नया डेटा सेव करने के लिए भेजें
-                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.saveLikeState) {
-                    AndroidInterface.saveLikeState(isLiked);
-                    console.log(`लाइक स्थिति सहेजी गई: ${isLiked}`);
-                }
-            });
+        // --- Event Listeners ---
+        
+        // प्रीवियस बटन
+        prevBtn.addEventListener('click', function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadContent(currentIndex);
+            }
+        });
 
-            // --- Download Button Functionality (वही) ---
-            downloadBtn.addEventListener('click', function() {
-                const imageUrl = hanumanImage.src; 
-                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.downloadImage) {
-                    AndroidInterface.downloadImage(imageUrl);
-                } else {
-                    const link = document.createElement('a');
-                    link.href = imageUrl;
-                    link.download = 'Hanuman_Ji_Photo.jpg'; 
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            });
+        // नेक्स्ट बटन
+        nextBtn.addEventListener('click', function() {
+            if (currentIndex < contentItems.length - 1) {
+                currentIndex++;
+                loadContent(currentIndex);
+            }
+        });
 
-            // --- WhatsApp Share Button Functionality (वही) ---
-            whatsappShareBtn.addEventListener('click', function() {
-                const shareText = "जय श्री राम! श्री हनुमान जी की यह सुंदर छवि देखें।";
-                const imageUrl = hanumanImage.src; 
-                
-                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.shareImageAndText) {
-                    AndroidInterface.shareImageAndText(shareText, imageUrl);
-                } else {
-                    const finalShareText = encodeURIComponent(shareText);
-                    window.location.href = `https://api.whatsapp.com/send?text=${finalShareText}`;
-                }
-            });
+        // लाइक बटन (Persistence अब URL पर आधारित है)
+        likeBtn.addEventListener('click', function() {
+            isLiked = !isLiked;
+            const currentItemUrl = contentItems[currentIndex].url;
+            
+            updateLikeUI();
+            
+            // Kotlin को वर्तमान URL और नई स्थिति सेव करने के लिए भेजें
+            if (typeof AndroidInterface !== 'undefined' && AndroidInterface.saveLikeState) {
+                AndroidInterface.saveLikeState(currentItemUrl, isLiked);
+            }
+        });
+
+        // डाउनलोड बटन (अब वर्तमान आइटम का URL उपयोग करता है)
+        downloadBtn.addEventListener('click', function() {
+            const imageUrl = contentItems[currentIndex].url; 
+            if (typeof AndroidInterface !== 'undefined' && AndroidInterface.downloadImage) {
+                AndroidInterface.downloadImage(imageUrl);
+            } else {
+                const link = document.createElement('a');
+                link.href = imageUrl;
+                link.download = contentItems[currentIndex].title.replace(/[^a-z0-9]/gi, '_') + '.jpg'; 
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
+        // WhatsApp शेयर बटन (अब वर्तमान आइटम का टेक्स्ट और URL उपयोग करता है)
+        whatsappShareBtn.addEventListener('click', function() {
+            const currentItem = contentItems[currentIndex];
+            const shareText = currentItem.shareText;
+            const imageUrl = currentItem.url; 
+            
+            if (typeof AndroidInterface !== 'undefined' && AndroidInterface.shareImageAndText) {
+                AndroidInterface.shareImageAndText(shareText, imageUrl);
+            } else {
+                const finalShareText = encodeURIComponent(shareText);
+                window.location.href = `https://api.whatsapp.com/send?text=${finalShareText}`;
+            }
+        });
+        
+        // पेज लोड होने पर पहला आइटम लोड करें
+        document.addEventListener('DOMContentLoaded', function() {
+            loadContent(currentIndex);
         });
     </script>
 </body>
