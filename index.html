@@ -3,176 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>श्री हनुमान जी और अन्य छवियाँ</title>
+    <title>स्क्रोलिंग इमेज गैलरी</title>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* CSS Variables for easier theme changes */
+        :root {
+            --primary-color: #ff4500; /* Deep Orange */
+            --bg-color: #f0f8ff; /* Azure White */
+            --card-bg: #ffffff;
+            --like-color: #28a745; /* Green for Like */
+            --unlike-color: #dc3545; /* Red for Unlike/Delete */
+            --download-color: #007bff; /* Blue */
+            --whatsapp-color: #25d366; /* WhatsApp Green */
+        }
+
         body {
             font-family: 'Inter', Arial, sans-serif;
-            background-color: #f0f8ff;
+            background-color: var(--bg-color);
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            /* Scroll view के लिए min-height हटा दिया गया */
             box-sizing: border-box; 
         }
-
-        .container {
-            text-align: center;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            max-width: 500px; 
-            width: 95%; 
-        }
-
-        h1 {
-            color: #ff4500;
-            margin-bottom: 10px; /* कम मार्जिन */
-            font-size: 1.5em; 
-            min-height: 3em; /* टेक्स्ट बदलने पर CLS से बचने के लिए */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .image-card img {
+        
+        /* मुख्य स्क्रॉलिंग कंटेनर */
+        .main-gallery {
             width: 100%;
-            height: 250px; /* स्थिर ऊँचाई */
-            object-fit: cover; /* इमेज को कवर करने के लिए */
-            border-radius: 10px;
-            border: 5px solid #ff4500;
-            margin-bottom: 20px;
-            display: block; 
+            max-width: 550px; /* अधिकतम चौड़ाई */
+            padding: 10px;
         }
 
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            gap: 10px;
+        .card-container {
+            text-align: center;
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px; /* कार्ड के बीच गैप */
         }
 
-        .nav-btn {
-            padding: 10px 15px;
-            border: none;
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.3em; 
+            padding: 0 10px;
+        }
+
+        /* --- Image Responsiveness --- */
+        .image-card {
+            border: 3px solid var(--primary-color);
             border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            background-color: #008080;
-            color: white;
-            flex-grow: 1;
-            transition: background-color 0.3s;
+            overflow: hidden; 
+            margin-bottom: 15px;
+        }
+        
+        .image-card img {
+            width: 100%; 
+            height: auto; 
+            max-height: 400px; 
+            display: block; 
+            object-fit: cover; 
         }
 
-        .nav-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .buttons-container {
+        /* --- Action Buttons Row --- */
+        .action-row {
             display: flex;
-            justify-content: space-around;
-            gap: 10px;
-            flex-wrap: wrap; 
+            gap: 8px; 
+            justify-content: space-between; /* बटनों के बीच समान स्थान */
         }
 
         .action-btn {
-            padding: 10px 15px;
+            padding: 10px 5px; /* पैडिंग कम की ताकि छोटे स्क्रीन पर फिट हो जाए */
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px; 
             font-weight: bold;
             transition: background-color 0.3s, transform 0.1s;
-            flex-grow: 1; 
-            min-width: 100px; 
+            flex-grow: 1; /* बटनों को समान रूप से फैलने दें */
+            min-width: 0; /* बहुत छोटी स्क्रीन पर सिकुड़ने दें */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: nowrap; /* सुनिश्चित करें कि टेक्स्ट एक लाइन में रहे */
         }
 
         .action-btn:active {
             transform: scale(0.98);
         }
 
-        /* डिफ़ॉल्ट/लाइक नहीं किया गया: हरा */
+        /* Individual Button Styling */
         .like-btn {
-            background-color: #28a745;
+            background-color: var(--like-color);
             color: white;
         }
-        
-        /* लाइक किया गया: लाल/अनलाइक करने के लिए तैयार */
         .like-btn.liked { 
-            background-color: #dc3545;
+            background-color: var(--unlike-color);
         }
 
         .download-btn {
-            background-color: #007bff;
+            background-color: var(--download-color);
             color: white;
         }
 
         .whatsapp-btn {
-            background-color: #25d366;
+            background-color: var(--whatsapp-color);
             color: white;
         }
 
         .action-btn i {
             margin-right: 5px;
         }
-
-        /* --- मोबाइल रिस्पॉन्सिवनेस --- */
-        @media (max-width: 500px) {
-            .container {
-                padding: 15px;
-                width: 100%; 
-                margin: 0;
-                box-shadow: none; 
-            }
-            body {
-                padding: 10px;
-            }
-            .buttons-container {
-                flex-direction: column;
-            }
+        
+        /* छोटी स्क्रीन पर आइकॉन को बड़ा करें और टेक्स्ट को छोटा करें यदि आवश्यक हो */
+        @media (max-width: 400px) {
             .action-btn {
-                margin-bottom: 8px;
+                font-size: 12px;
+                padding: 10px 3px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- यह गतिशील रूप से अपडेट होगा -->
-        <h1 id="contentTitle">जय श्री राम | जय हनुमान ज्ञान गुन सागर</h1>
-        
-        <!-- नेविगेशन बटन -->
-        <div class="nav-buttons">
-            <button id="prevBtn" class="nav-btn"><i class="fas fa-chevron-left"></i> पिछला</button>
-            <button id="nextBtn" class="nav-btn">अगला <i class="fas fa-chevron-right"></i></button>
-        </div>
-
-        <div class="image-card">
-            <img id="mainImage" src="" alt="सामग्री छवि">
-            
-            <div class="buttons-container">
-                
-                <button id="likeBtn" class="action-btn like-btn">
-                    <i class="fas fa-thumbs-up"></i> लाइक करें
-                </button>
-                
-                <button id="downloadBtn" class="action-btn download-btn">
-                    <i class="fas fa-download"></i> डाउनलोड
-                </button>
-                
-                <button id="whatsappShareBtn" class="action-btn whatsapp-btn">
-                    <i class="fab fa-whatsapp"></i> WhatsApp शेयर
-                </button>
-                
-            </div>
-        </div>
-        
+    <div class="main-gallery" id="galleryContainer">
+        <!-- Content will be injected here by JavaScript -->
     </div>
 
     <script>
@@ -194,22 +151,14 @@
                 shareText: "सूरजमुखी की खुशबू वाला खूबसूरत दिन।" 
             }
         ];
-
-        let currentIndex = 0;
-        let isLiked = false; // वर्तमान आइटम के लिए लाइक स्थिति
-
-        const contentTitle = document.getElementById('contentTitle');
-        const mainImage = document.getElementById('mainImage');
-        const likeBtn = document.getElementById('likeBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const whatsappShareBtn = document.getElementById('whatsappShareBtn');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
+        
+        const galleryContainer = document.getElementById('galleryContainer');
 
         // --- 1. UI अपडेट फ़ंक्शन ---
-        function updateLikeUI() {
+        // यह फ़ंक्शन विशिष्ट बटन को अपडेट करता है
+        function updateLikeUI(likeBtn, isLiked) {
             if (isLiked) {
-                likeBtn.innerHTML = `<i class="fas fa-heart"></i> अनलाइक करें`; 
+                likeBtn.innerHTML = `<i class="fas fa-heart"></i> अनलाइक`; 
                 likeBtn.classList.add('liked'); 
             } else {
                 likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> लाइक करें`;
@@ -217,97 +166,125 @@
             }
         }
         
-        // --- 2. नेविगेशन बटन स्थिति अपडेट फ़ंक्शन ---
-        function updateNavButtons() {
-            prevBtn.disabled = currentIndex === 0;
-            nextBtn.disabled = currentIndex === contentItems.length - 1;
-        }
-
-        // --- 3. लोड कंटेंट और लाइक स्थिति फ़ंक्शन ---
-        function loadContent(index) {
-            const item = contentItems[index];
+        // --- 2. लाइक हैंडलर फ़ंक्शन ---
+        function handleLikeClick(event, itemUrl) {
+            const likeBtn = event.currentTarget;
             
-            // टाइटल और इमेज बदलें
-            contentTitle.textContent = item.title;
-            mainImage.src = item.url;
+            // वर्तमान स्थिति को टॉगल करें (UI से क्लास चेक करें)
+            let isLiked = likeBtn.classList.contains('liked');
+            isLiked = !isLiked; // नई स्थिति
             
-            // Native कोड उपलब्ध होने पर लाइक स्थिति लोड करें
-            if (typeof AndroidInterface !== 'undefined' && AndroidInterface.getIsLiked) {
-                // इमेज URL को अनोखी ID (contentId) के रूप में उपयोग करें
-                isLiked = AndroidInterface.getIsLiked(item.url); 
-            } else {
-                isLiked = false;
-            }
-            
-            // UI और नेविगेशन बटन अपडेट करें
-            updateLikeUI();
-            updateNavButtons();
-        }
-
-        // --- Event Listeners ---
-        
-        // प्रीवियस बटन
-        prevBtn.addEventListener('click', function() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                loadContent(currentIndex);
-            }
-        });
-
-        // नेक्स्ट बटन
-        nextBtn.addEventListener('click', function() {
-            if (currentIndex < contentItems.length - 1) {
-                currentIndex++;
-                loadContent(currentIndex);
-            }
-        });
-
-        // लाइक बटन (Persistence अब URL पर आधारित है)
-        likeBtn.addEventListener('click', function() {
-            isLiked = !isLiked;
-            const currentItemUrl = contentItems[currentIndex].url;
-            
-            updateLikeUI();
+            updateLikeUI(likeBtn, isLiked);
             
             // Kotlin को वर्तमान URL और नई स्थिति सेव करने के लिए भेजें
             if (typeof AndroidInterface !== 'undefined' && AndroidInterface.saveLikeState) {
-                AndroidInterface.saveLikeState(currentItemUrl, isLiked);
+                AndroidInterface.saveLikeState(itemUrl, isLiked);
             }
-        });
+        }
 
-        // डाउनलोड बटन (अब वर्तमान आइटम का URL उपयोग करता है)
-        downloadBtn.addEventListener('click', function() {
-            const imageUrl = contentItems[currentIndex].url; 
+        // --- 3. डाउनलोड हैंडलर फ़ंक्शन ---
+        function handleDownloadClick(item) {
+            const imageUrl = item.url; 
             if (typeof AndroidInterface !== 'undefined' && AndroidInterface.downloadImage) {
                 AndroidInterface.downloadImage(imageUrl);
             } else {
+                // Fallback
                 const link = document.createElement('a');
                 link.href = imageUrl;
-                link.download = contentItems[currentIndex].title.replace(/[^a-z0-9]/gi, '_') + '.jpg'; 
+                link.download = item.title.replace(/[^a-z0-9]/gi, '_') + '.jpg'; 
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             }
-        });
+        }
 
-        // WhatsApp शेयर बटन (अब वर्तमान आइटम का टेक्स्ट और URL उपयोग करता है)
-        whatsappShareBtn.addEventListener('click', function() {
-            const currentItem = contentItems[currentIndex];
-            const shareText = currentItem.shareText;
-            const imageUrl = currentItem.url; 
+        // --- 4. WhatsApp शेयर हैंडलर फ़ंक्शन ---
+        function handleShareClick(item) {
+            const shareText = item.shareText;
+            const imageUrl = item.url; 
             
             if (typeof AndroidInterface !== 'undefined' && AndroidInterface.shareImageAndText) {
                 AndroidInterface.shareImageAndText(shareText, imageUrl);
             } else {
+                // Fallback
                 const finalShareText = encodeURIComponent(shareText);
                 window.location.href = `https://api.whatsapp.com/send?text=${finalShareText}`;
             }
-        });
-        
-        // पेज लोड होने पर पहला आइटम लोड करें
-        document.addEventListener('DOMContentLoaded', function() {
-            loadContent(currentIndex);
-        });
+        }
+
+
+        // --- 5. मुख्य रेंडरिंग फ़ंक्शन ---
+        function renderGallery() {
+            // गैलरी को साफ़ करें
+            galleryContainer.innerHTML = ''; 
+
+            contentItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card-container';
+                
+                // --- 1. शीर्षक ---
+                const title = document.createElement('h2');
+                title.textContent = item.title;
+
+                // --- 2. इमेज ---
+                const imageCard = document.createElement('div');
+                imageCard.className = 'image-card';
+                const img = document.createElement('img');
+                img.src = item.url;
+                img.alt = item.title;
+                imageCard.appendChild(img);
+
+                // --- 3. बटन पंक्ति ---
+                const actionRow = document.createElement('div');
+                actionRow.className = 'action-row';
+
+                // a. लाइक बटन
+                const likeBtn = document.createElement('button');
+                likeBtn.className = 'action-btn like-btn';
+                
+                // Kotlin से लाइक की स्थिति लोड करें (सिंक्रोनस, क्योंकि यह DOMContentLoaded के बाद चलता है)
+                let isLiked = false;
+                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.getIsLiked) {
+                    isLiked = AndroidInterface.getIsLiked(item.url); 
+                }
+                updateLikeUI(likeBtn, isLiked);
+                
+                // इवेंट लिसनर
+                likeBtn.addEventListener('click', (e) => handleLikeClick(e, item.url));
+
+
+                // b. डाउनलोड बटन
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'action-btn download-btn';
+                downloadBtn.innerHTML = `<i class="fas fa-download"></i> डाउनलोड`;
+                downloadBtn.addEventListener('click', () => handleDownloadClick(item));
+
+
+                // c. WhatsApp शेयर बटन
+                const whatsappShareBtn = document.createElement('button');
+                whatsappShareBtn.className = 'action-btn whatsapp-btn';
+                whatsappShareBtn.innerHTML = `<i class="fab fa-whatsapp"></i> शेयर`;
+                whatsappShareBtn.addEventListener('click', () => handleShareClick(item));
+
+                
+                // बटनों को पंक्ति में जोड़ें
+                actionRow.appendChild(likeBtn);
+                actionRow.appendChild(downloadBtn);
+                actionRow.appendChild(whatsappShareBtn);
+
+
+                // कार्ड में सब कुछ जोड़ें
+                card.appendChild(title);
+                card.appendChild(imageCard);
+                card.appendChild(actionRow);
+                
+                // गैलरी कंटेनर में कार्ड जोड़ें
+                galleryContainer.appendChild(card);
+            });
+        }
+
+        // पेज लोड होने पर गैलरी रेंडर करें
+        document.addEventListener('DOMContentLoaded', renderGallery);
     </script>
 </body>
 </html>
