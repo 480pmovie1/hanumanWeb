@@ -2,8 +2,10 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
+    <!-- मोबाइल रिस्पॉन्सिवनेस के लिए जरूरी -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>श्री हनुमान जी</title>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
@@ -155,18 +157,20 @@
                     likeBtn.innerHTML = `<i class="fas fa-thumbs-up"></i> लाइक (${likes})`;
                     likeBtn.classList.add('liked');
                     isLiked = true;
-                    alert(`जय श्री राम! आपने लाइक किया। कुल लाइक: ${likes}`);
+                    // चूंकि Canvas में alert काम नहीं करता है, हम एक Toast का उपयोग करते हैं
+                    // AndroidInterface.showToast(`जय श्री राम! आपने लाइक किया। कुल लाइक: ${likes}`);
+                    console.log(`जय श्री राम! आपने लाइक किया। कुल लाइक: ${likes}`);
                 } else {
-                    alert('आप पहले ही लाइक कर चुके हैं!');
+                    console.log('आप पहले ही लाइक कर चुके हैं!');
                 }
             });
 
-            // --- Download Button Functionality (FIXED using fetch/Blob) ---
+            // --- Download Button Functionality (FIXED) ---
             downloadBtn.addEventListener('click', async function() {
                 const urlToDownload = hanumanImage.src;
                 
                 if (urlToDownload.includes('placeholder')) {
-                     alert('पहले हनुमान जी की वास्तविक फोटो का URL बदलें।');
+                     console.error('पहले हनुमान जी की वास्तविक फोटो का URL बदलें।');
                      return;
                 }
 
@@ -185,22 +189,22 @@
                     
                     URL.revokeObjectURL(objectUrl); 
                     
-                    alert('हनुमान जी की छवि सफलतापूर्वक डाउनलोड हो रही है... 🙏');
+                    console.log('हनुमान जी की छवि सफलतापूर्वक डाउनलोड हो रही है... 🙏');
                 } catch (error) {
                     console.error('Download failed:', error);
-                    alert('क्षमा करें, डाउनलोड करने में कोई समस्या आई।');
                 }
             });
 
-            // --- WhatsApp Share Button Functionality (FIXED for Kotlin WebView) ---
+            // --- WhatsApp Share Button Functionality (FIXED: Now passes Image URL) ---
             whatsappShareBtn.addEventListener('click', function() {
                 const shareText = "जय श्री राम! श्री हनुमान जी की यह सुंदर छवि देखें।";
+                const imageUrl = hanumanImage.src; // इमेज URL प्राप्त करें
                 
-                // WebView से Native Code को कॉल करें
-                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.shareContent) {
-                    AndroidInterface.shareContent(shareText);
+                // Native Code को कॉल करें, नया फ़ंक्शन shareImageAndText
+                if (typeof AndroidInterface !== 'undefined' && AndroidInterface.shareImageAndText) {
+                    AndroidInterface.shareImageAndText(shareText, imageUrl);
                 } else {
-                    // Fallback: अगर Native इंटरफ़ेस उपलब्ध नहीं है
+                    // Fallback (केवल टेक्स्ट, क्योंकि इमेज शेयरिंग के लिए Native कोड चाहिए)
                     const finalShareText = encodeURIComponent(shareText);
                     window.location.href = `https://api.whatsapp.com/send?text=${finalShareText}`;
                 }
